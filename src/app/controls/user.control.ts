@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
-import { user } from "../interface/user.interface";
+import { User } from "../interface/user.interface";
+import userModel from "../models/user.model";
 
 const userRouter = Router();
 
@@ -7,10 +8,36 @@ userRouter.get("/", (req: Request, res: Response) => {
     res.send("Welcome to darcy Staffing! This is the user route!");
 })
 
-userRouter.post("/register", (req: Request, res: Response) => {
-    const userData: user = req.body;
+userRouter.post("/register", async (req: Request, res: Response) => {
+    try {
 
-    console.log(userData);
+        const userData = req.body;
+
+        const isExists = await userModel.findOne(userData?.email);
+
+        if (isExists) {
+            return res.status(400).json({
+                success: true,
+                message: "User already exists!"
+            })
+        }
+
+        const result = await userModel.insertOne(userData);
+
+        res.status(201).json({
+            success: true,
+            message: "Registration Completed!",
+            registeredData: result
+        })
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            message: "Registration Failed!",
+            error: err
+        })
+    }
 })
+
+
 
 export default userRouter;

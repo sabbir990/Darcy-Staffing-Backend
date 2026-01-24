@@ -1,13 +1,52 @@
 import mongoose from "mongoose";
-import { user } from "../interface/user.interface";
+import { User } from "../interface/user.interface";
 
-const userSchema = new mongoose.Schema<user>({
-    username: {type: String, required: [true, "Username is a required field!"], unique: true},
-    email: {type: String, required: [true, "Email is a required field!"], unique: true},
-    password: {type: String, required: [true, "Password is a required field!"]},
-    role: {type: String, enum: ['admin', 'client'], required: [true, "Role is a required field!"], default: 'client'},
-}, {timestamps: true});
+const userSchema = new mongoose.Schema<User>({
+    contractorType: { type: String, required: [true, "Contractor type is required!"], trim: true },
+    packagePrice: { type: Number, required: [true, "Package Price is required!"] },
+    
+    businessName: { type: String, trim: true },
+    streetAddress: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String },
+    zipCode: { type: String },
+    
+    name: { type: String },
+    emailAddress: { type: String },
+    phoneNumber: { type: String }, // Matched to String
+    title: { type: String },
+    
+    secondaryContactName: { type: String },
+    secondaryContactEmailAddress: { type: String },
+    secondaryContactPhoneNumber: { type: String }, // Matched to String
+    
+    hoursWorked: { type: String }, // Matched to Number
+    driverSchedule: { type: String },
+    pay: { type: String }, // Matched to Number
+    ratePerStop: { type: String }, // Matched to Number
+    stopsPerDay: { type: String }, // Matched to Number
+    
+    benefits: { type: String },
+    truckSize: { type: String },
+    terminalAddress: { type: String },
+    
+    clientID: { type: String },
+    userID: { type: String },
+    systemAccessPassword: { type: String },
+    sequrityQuestionAnswer: { type: String },
+    indeedUsernameOrEmail: { type: String },
+    indeedPassword: { type: String },
+    
+    authorizedDate: { type: String }, 
+    authorizedSignature: { type: String },
+    position: { type: String },
+    companyName: { type: String },
+    username: {type: String},
+    email: {type: String},
+    password: {type: String}
+}, { timestamps: true });
 
-const userModel = mongoose.model("User", userSchema);
+// The 3rd argument "users" is CRITICAL to fix the InvalidNamespace error
+const userModel = mongoose.model<User>("User", userSchema, "users");
 
 export default userModel;
