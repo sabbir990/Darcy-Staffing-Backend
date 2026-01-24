@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
-import { User } from "../interface/user.interface";
 import userModel from "../models/user.model";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const userRouter = Router();
 
@@ -13,7 +14,7 @@ userRouter.post("/register", async (req: Request, res: Response) => {
 
         const userData = req.body;
 
-        const isExists = await userModel.findOne(userData?.email);
+        const isExists = await userModel.findOne({email : userData?.email});
 
         if (isExists) {
             return res.status(400).json({
@@ -22,7 +23,14 @@ userRouter.post("/register", async (req: Request, res: Response) => {
             })
         }
 
-        const result = await userModel.insertOne(userData);
+        const {password, ...othersData} = userData;
+        const plainPassword = userData?.password;
+        const salt = 10;
+        const hashedPassword = bcrypt.hashSync(plainPassword, salt);
+
+        const newUserObject = { ...othersData, password: hashedPassword };
+
+        const result = await userModel.create(newUserObject);
 
         res.status(201).json({
             success: true,
@@ -38,6 +46,17 @@ userRouter.post("/register", async (req: Request, res: Response) => {
     }
 })
 
+userRouter.post("/login", async (req: Request, res: Response) => {
+    try{
+        const {email, password} = req.body;
 
+        const isExists = await userModel.findOne({email});
+        // const returnHashPassword = bcrypt.compareSync(password, isExists.password);
+
+        // if(isExists & )
+    }catch(err){
+
+    }
+})
 
 export default userRouter;

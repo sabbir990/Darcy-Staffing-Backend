@@ -3,7 +3,7 @@ import { User } from "../interface/user.interface";
 
 const userSchema = new mongoose.Schema<User>({
     contractorType: { type: String, required: [true, "Contractor type is required!"], trim: true },
-    packagePrice: { type: Number, required: [true, "Package Price is required!"] },
+    packagePrice: { type: Number, required: [true, "Package Price is required!"]},
     
     businessName: { type: String, trim: true },
     streetAddress: { type: String, trim: true },
@@ -43,7 +43,8 @@ const userSchema = new mongoose.Schema<User>({
     companyName: { type: String },
     username: {type: String},
     email: {type: String},
-    password: {type: String}
+    password: {type: String},
+    role: {type: String, default: "client"}
 }, { timestamps: true });
 
 // The 3rd argument "users" is CRITICAL to fix the InvalidNamespace error

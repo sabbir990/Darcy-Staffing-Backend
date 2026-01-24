@@ -43,6 +43,7 @@ interface User {
     authorizedDate?: string; // Changed to string to match your Date picker output
     position?: string;
     companyName?: string;
+    role?: 'client' | 'admin';
 }
 
 export type { User };
