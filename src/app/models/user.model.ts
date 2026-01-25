@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema<User>({
     username: {type: String},
     email: {type: String},
     password: {type: String},
-    role: {type: String, default: "client"}
+    role: {type: String, required: true, default: "client"}
 }, { timestamps: true });
 
 // The 3rd argument "users" is CRITICAL to fix the InvalidNamespace error
