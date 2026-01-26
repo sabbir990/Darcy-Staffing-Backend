@@ -7,9 +7,12 @@ const MessageSchema = new Schema({
 });
 
 const ConversationSchema = new Schema({
-  userId: { type: String, required: true }, // The mock ID you've been using
+  userId: { type: String, required: true },
   subject: { type: String, required: true },
-  messages: [MessageSchema] // This is the array of chats
+  messages: [MessageSchema],
+  lastSender: { type: String }, // Track who sent the last message
+  status: { type: String, default: "open" }, // open, closed, or pending
+  isRead: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.model("Conversation", ConversationSchema);

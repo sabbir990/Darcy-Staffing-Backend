@@ -1,49 +1,55 @@
-interface User {
+export interface User {
+    // MongoDB internal ID
+    _id?: string; 
 
-    username?: string,
-    email?: string,
-    password?: string,
+    // Required fields (No '?' because Mongoose requires them)
+    contractorType: string;
+    packagePrice: number;
+    role: string;
 
-    contractorType?: string;
-    packagePrice?: number;
-
+    // Optional fields (Using '?' because Mongoose doesn't mark them required)
     businessName?: string;
     streetAddress?: string;
     city?: string;
     state?: string;
     zipCode?: string;
-
+    
     name?: string;
     emailAddress?: string;
-    phoneNumber?: string; // Changed to string (Phone numbers often start with 0 or +)
+    phoneNumber?: string; 
     title?: string;
-
+    
     secondaryContactName?: string;
     secondaryContactEmailAddress?: string;
-    secondaryContactPhoneNumber?: string; // Changed to string
-
-    hoursWorked?: string; // Changed to number
+    secondaryContactPhoneNumber?: string;
+    
+    hoursWorked?: string;
     driverSchedule?: string;
-    pay?: string; // Changed to number
-    payType?: string;
-    ratePerStop?: string; // Changed to number
-    stopsPerDay?: string; // Changed to number
+    pay?: string;
+    ratePerStop?: string;
+    stopsPerDay?: string;
+    
     benefits?: string;
     truckSize?: string;
     terminalAddress?: string;
-
+    
     clientID?: string;
     userID?: string;
     systemAccessPassword?: string;
-    sequrityQuestionAnswer?: string;
+    sequrityQuestionAnswer?: string; // Note: You have a typo 'sequrity' in model, interface must match it!
     indeedUsernameOrEmail?: string;
     indeedPassword?: string;
-
+    
+    authorizedDate?: string; 
     authorizedSignature?: string;
-    authorizedDate?: string; // Changed to string to match your Date picker output
     position?: string;
     companyName?: string;
-    role?: 'client' | 'admin';
-}
+    
+    username?: string;
+    email?: string;
+    password?: string;
 
-export type { User };
+    // Automatically added by { timestamps: true }
+    createdAt?: Date;
+    updatedAt?: Date;
+}

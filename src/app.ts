@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import msgRouter from "./app/controls/message.control";
 import clientRouter from "./app/router/client.router";
+import applicantRouter from "./app/controls/applicants.controls";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,7 +37,8 @@ app.use("/payment", paymentRouter);
 app.use("/schedule-interview", interviewRouter);
 app.use("/documents", docRouter); // Added the document management route
 app.use("/messages", msgRouter);
-app.use("/client", clientRouter)
+app.use("/client", clientRouter);
+app.use("/applicants", applicantRouter);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome to darcy staffing backend!");

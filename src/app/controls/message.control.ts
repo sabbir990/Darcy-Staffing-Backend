@@ -12,21 +12,28 @@ msgRouter.get("/", async (req, res) => {
 
 // 2. Start a new conversation (The Modal)
 msgRouter.post("/new", async (req, res) => {
-  const { subject, text } = req.body;
+  const { subject, text, sender } = req.body;
   const newConv = await Conversation.create({
     userId: MOCK_USER,
     subject,
-    messages: [{ text }]
+    lastSender: sender || "Staff",
+    messages: [{ 
+      text, 
+      sender: sender || "Staff" 
+    }]
   });
   res.status(201).json({ success: true, data: newConv });
 });
 
-// 3. Add a reply to existing chat
+// 3. Add a reply (USE ONLY THIS VERSION)
 msgRouter.post("/reply/:id", async (req, res) => {
-  const { text } = req.body;
+  const { text, sender } = req.body;
   const updated = await Conversation.findByIdAndUpdate(
     req.params.id,
-    { $push: { messages: { text } } },
+    { 
+      $push: { messages: { text, sender, time: new Date() } },
+      $set: { lastSender: sender } 
+    },
     { new: true }
   );
   res.json({ success: true, data: updated });

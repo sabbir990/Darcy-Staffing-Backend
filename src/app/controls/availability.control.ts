@@ -60,4 +60,32 @@ interviewRouter.get("/month/:yearMonth", async (req: Request, res: Response) => 
     }
 });
 
+interviewRouter.post("/book", async (req: Request, res: Response) => {
+    try {
+        const { date, time, clientName, clientPhone, clientEmail } = req.body;
+        const userId = (req as any).user?.id || "507f1f77bcf86cd799439011";
+
+        const availability = await Availability.findOne({ userId, date });
+        if (!availability) {
+            return res.status(404).json({ success: false, message: "No availability found for this date" });
+        }
+
+        // Find the specific slot and update it
+        const slot = availability.slots.find(s => s.time === time);
+        if (!slot) {
+            return res.status(404).json({ success: false, message: "Time slot not found" });
+        }
+
+        slot.status = 'Booked';
+        slot.clientName = clientName;
+        slot.clientPhone = clientPhone;
+        // Note: You might want to add clientEmail to your ISlot interface/model too
+
+        await availability.save();
+        res.status(200).json({ success: true, data: availability });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default interviewRouter;

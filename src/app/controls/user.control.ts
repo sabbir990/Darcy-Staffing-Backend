@@ -152,4 +152,41 @@ userRouter.get("/profile", verifyToken, async (req: any, res: Response) => {
     }
 });
 
+userRouter.put("/update-profile", verifyToken, async (req: any, res: Response) => {
+    try {
+        // req.user.id comes from your verifyToken middleware
+        const userId = req.user.id;
+        const updateData = req.body;
+
+        // Prevent users from manually changing their role or email through this route for security
+        delete updateData.role;
+        delete updateData.password; 
+
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found!" 
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully!",
+            data: updatedUser
+        });
+    } catch (err) {
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update profile", 
+            error: err 
+        });
+    }
+});
+
 export default userRouter;
