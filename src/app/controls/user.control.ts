@@ -1,8 +1,8 @@
 import { Request, Response, Router, NextFunction } from "express";
-import userModel from "../models/user.model";
+import userModel from "../models/user.model.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { verifyToken } from "../middlewares/auth.middleware";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const userRouter = Router();
 

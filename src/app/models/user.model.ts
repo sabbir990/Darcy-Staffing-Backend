@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../interface/user.interface";
+import { User } from "../interface/user.interface.js";
 
 const userSchema = new mongoose.Schema<User>({
     contractorType: { type: String, required: [true, "Contractor type is required!"], trim: true },

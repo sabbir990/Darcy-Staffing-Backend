@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { IDocument } from "../interface/document.interface";
+import { IDocument } from "../interface/document.interface.js";
 
 // Extend the interface for Mongoose Document methods
 export interface IDocumentSchema extends IDocument, Document {

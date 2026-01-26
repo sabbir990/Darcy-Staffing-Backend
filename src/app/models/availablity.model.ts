@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { IAvailability } from "../interface/availablity.interface";
+import { IAvailability } from "../interface/availablity.interface.js";
 
 export interface IAvailabilityDocument extends Omit<IAvailability, '_id'>, Document {}
 

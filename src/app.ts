@@ -1,16 +1,16 @@
 import express, { Request, Response, type Application } from "express";
-import userRouter from "./app/controls/user.control";
+import userRouter from "./app/controls/user.control.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path"; // Added for path resolution
-import paymentRouter from "./app/controls/payment.control";
-import interviewRouter from "./app/controls/availability.control";
-import docRouter from "./app/controls/doc.control";
+import paymentRouter from "./app/controls/payment.control.js";
+import interviewRouter from "./app/controls/availability.control.js";
+import docRouter from "./app/controls/doc.control.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import msgRouter from "./app/controls/message.control";
-import clientRouter from "./app/router/client.router";
-import applicantRouter from "./app/controls/applicants.controls";
+import msgRouter from "./app/controls/message.control.js";
+import clientRouter from "./app/router/client.router.js";
+import applicantRouter from "./app/controls/applicants.controls.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

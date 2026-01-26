@@ -1,6 +1,6 @@
 import { type Request, Router, type Response } from "express";
 import Stripe from "stripe";
-import PaymentInfoModel from "../models/payment.model";
+import PaymentInfoModel from "../models/payment.model.js";
 
 const paymentRouter = Router();
 

@@ -19,6 +19,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.0.8",
+    "@vercel/node": "^5.5.27",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

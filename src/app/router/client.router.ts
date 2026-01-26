@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
-import clientModel from "../models/client.model";
-import { verifyToken } from "../middlewares/auth.middleware";
+import clientModel from "../models/client.model.js";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const clientRouter = Router();
 

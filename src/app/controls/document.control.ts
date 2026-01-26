@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import Document from "../models/document.model";
+import Document from "../models/document.model.js";
 
 const docRouter = Router();
 const upload = multer({ dest: "uploads/" }); // Files will go here

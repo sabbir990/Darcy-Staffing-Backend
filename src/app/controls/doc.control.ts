@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url'; // Required for DELETE logic in ES Modules
 import { dirname } from 'path';
-import Document from "../models/document.model";
+import Document from "../models/document.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

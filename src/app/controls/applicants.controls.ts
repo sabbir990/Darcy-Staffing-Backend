@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import Applicant from "../models/applicants.model"; // Ensure this path matches your model location
+import Applicant from "../models/applicants.model.js"; // Ensure this path matches your model location
 import mongoose from 'mongoose';
 
 const applicantRouter = Router();

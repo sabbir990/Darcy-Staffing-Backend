@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import Availability from "../models/availablity.model";
+import Availability from "../models/availablity.model.js";
 import mongoose from 'mongoose';
 
 const interviewRouter = Router();

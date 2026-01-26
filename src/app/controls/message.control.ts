@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Conversation from "../models/message.model";
+import Conversation from "../models/message.model.js";
 
 const msgRouter = Router();
 const MOCK_USER = "507f1f77bcf86cd799439011";

@@ -1,27 +1,23 @@
-import {Server} from "http"
-import app from "./app";
+import app from "./app.js";
 import mongoose from "mongoose";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 
 dotenv.config();
-
-let server: Server;
 
 const PORT = 3000;
 const mongoDB_connection_string: string = process.env.MONGODB_CONNECTION_STRING as string;
 
-export default function main(){
-    try{
-        const connection = mongoose.connect(mongoDB_connection_string);
-
-        console.log("Mongoose is connected!");
-        
-        server = app.listen(PORT, () => {
-            console.log("This server is running on port ", PORT);
-        })
-    }catch(err){
-        console.log(err)
-    }
+async function main() {
+  try {
+    await mongoose.connect(mongoDB_connection_string);
+    console.log("MongoDB connected!");
+    
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Error starting server:", err);
+  }
 }
 
 main();

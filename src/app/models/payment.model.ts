@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Payment from "../interface/payment.interface";
+import Payment from "../interface/payment.interface.js";
 
 const paymentInfoSchema = new mongoose.Schema<Payment>({
     cardholderName: {type: String, required: [true, "cardholderName is a required field!"]},
