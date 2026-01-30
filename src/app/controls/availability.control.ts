@@ -6,6 +6,34 @@ const interviewRouter = Router();
 
 // const MOCK_ID = "65b2f1e1f1e1f1e1f1e1f1e1"; // A valid hex string
 
+interviewRouter.get("/scheduled", async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user?.id || "507f1f77bcf86cd799439011";
+        const data = await Availability.find({ 
+            userId, 
+            "slots.status": "Booked" 
+        });
+
+        const scheduledMeetings = data.flatMap(doc => 
+            doc.slots
+                .filter(slot => slot.status === "Booked")
+                .map(slot => ({
+                    _id: `${doc._id}-${slot.time}`,
+                    date: doc.date,
+                    time: slot.time,
+                    clientName: slot.clientName,
+                    clientPhone: slot.clientPhone
+                }))
+        );
+
+        scheduledMeetings.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        res.status(200).json({ success: true, data: scheduledMeetings });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 interviewRouter.get("/:date", async (req: Request, res: Response) => {
     try {
         const { date } = req.params;
@@ -83,6 +111,69 @@ interviewRouter.post("/book", async (req: Request, res: Response) => {
 
         await availability.save();
         res.status(200).json({ success: true, data: availability });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+interviewRouter.post("/reschedule", async (req: Request, res: Response) => {
+    try {
+        const { oldDate, oldTime, newDate, newTime, clientName, clientPhone } = req.body;
+        const userId = (req as any).user?.id || "507f1f77bcf86cd799439011";
+
+        // 1. Clear the OLD slot
+        await Availability.findOneAndUpdate(
+            { userId, date: oldDate, "slots.time": oldTime },
+            { 
+                $set: { 
+                    "slots.$.status": "Available",
+                    "slots.$.clientName": "",
+                    "slots.$.clientPhone": "" 
+                } 
+            }
+        );
+
+        // 2. Book the NEW slot
+        const result = await Availability.findOneAndUpdate(
+            { userId, date: newDate, "slots.time": newTime },
+            { 
+                $set: { 
+                    "slots.$.status": "Booked",
+                    "slots.$.clientName": clientName,
+                    "slots.$.clientPhone": clientPhone 
+                } 
+            },
+            { new: true }
+        );
+
+        res.status(200).json({ success: true, data: result });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+interviewRouter.post("/cancel", async (req: Request, res: Response) => {
+    try {
+        const { date, time } = req.body;
+        const userId = (req as any).user?.id || "507f1f77bcf86cd799439011";
+
+        const result = await Availability.findOneAndUpdate(
+            { userId, date, "slots.time": time },
+            { 
+                $set: { 
+                    "slots.$.status": "Available",
+                    "slots.$.clientName": "",
+                    "slots.$.clientPhone": "" 
+                } 
+            },
+            { new: true }
+        );
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: "Slot not found" });
+        }
+
+        res.status(200).json({ success: true, data: result });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }
