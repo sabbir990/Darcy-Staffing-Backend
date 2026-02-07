@@ -1,3 +1,11 @@
+export interface ServiceItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    addedDate: string; // When this service was added
+  }
+
 export interface User {
     // MongoDB internal ID
     _id?: string; 
@@ -52,4 +60,7 @@ export interface User {
     // Automatically added by { timestamps: true }
     createdAt?: Date;
     updatedAt?: Date;
+
+    activeServices?: ServiceItem[];
+    nextBillingDate?: string;
 }

@@ -189,4 +189,53 @@ userRouter.put("/update-profile", verifyToken, async (req: any, res: Response) =
     }
 });
 
+userRouter.post("/update-subscription", verifyToken, async (req: any, res: Response) => {
+    try {
+        const userId = req.user.id;
+        const { newServices, newMonthlyTotal } = req.body;
+
+        // Calculate next billing date (30 days from now)
+        const nextBillingDate = new Date();
+        nextBillingDate.setDate(nextBillingDate.getDate() + 30);
+
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { 
+                $push: { 
+                    activeServices: { 
+                        $each: newServices.map((service: any) => ({
+                            ...service,
+                            addedDate: new Date().toISOString()
+                        }))
+                    } 
+                },
+                $set: { 
+                    packagePrice: newMonthlyTotal,
+                    nextBillingDate: nextBillingDate.toISOString()
+                }
+            },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found!" 
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Subscription updated successfully!",
+            data: updatedUser
+        });
+    } catch (err) {
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update subscription", 
+            error: err 
+        });
+    }
+});
+
 export default userRouter;
