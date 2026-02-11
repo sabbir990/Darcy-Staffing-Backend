@@ -4,19 +4,55 @@ import { Request, Response, Router } from "express";
 import clientModel from "../models/client.model.js";
 import userModel from "../models/user.model.js";
 import { verifyToken } from "../middlewares/auth.middleware.js";
+import timeLogModel from "../models/timeLog.model.js";
+import mongoose from "mongoose";
 
 const clientRouter = Router();
 
 // GET all clients (for the dashboard)
 clientRouter.get("/all", verifyToken, async (req: Request, res: Response) => {
     try {
-        const clients = await clientModel.find().sort({ createdAt: -1 });
+        const clientsWithTime = await clientModel.aggregate([
+            // 1. Join with TimeLogs collection
+            {
+                $lookup: {
+                    from: "timelogs", // This must match your MongoDB collection name (usually lowercase plural)
+                    localField: "_id",
+                    foreignField: "clientId",
+                    as: "timeData"
+                }
+            },
+            // 2. Sum up the totalSeconds from the array of timeData
+            {
+                $addFields: {
+                    totalTimeSpent: { $sum: "$timeData.totalSeconds" },
+                    // Also get the most recent access date
+                    lastAccessed: { $max: "$timeData.lastAccessed" }
+                }
+            },
+            // 3. Remove the raw timeData array to keep the response clean
+            {
+                $project: {
+                    timeData: 0
+                }
+            },
+            // 4. Sort by most recently created client first
+            {
+                $sort: { createdAt: -1 }
+            }
+        ]);
+
         res.status(200).json({
             success: true,
-            data: clients
+            data: clientsWithTime
         });
     } catch (err) {
-        res.status(500).json({ success: false, message: "Failed to fetch clients", error: err });
+        console.error("Aggregation Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to fetch clients with time data", 
+            error: err 
+        });
     }
 });
 
@@ -24,11 +60,11 @@ clientRouter.get("/all", verifyToken, async (req: Request, res: Response) => {
 clientRouter.get("/:id", verifyToken, async (req: Request, res: Response) => {
     try {
         const client = await clientModel.findById(req.params.id);
-        
+
         if (!client) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Client not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Client not found"
             });
         }
 
@@ -37,10 +73,10 @@ clientRouter.get("/:id", verifyToken, async (req: Request, res: Response) => {
             data: client
         });
     } catch (err) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Failed to fetch client", 
-            error: err 
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch client",
+            error: err
         });
     }
 });
@@ -94,18 +130,18 @@ clientRouter.post("/add", verifyToken, async (req: Request, res: Response) => {
         };
 
         const result = await clientModel.create(newClientObject);
-        
-        res.status(201).json({ 
-            success: true, 
+
+        res.status(201).json({
+            success: true,
             message: "Client added successfully!",
-            data: result 
+            data: result
         });
     } catch (err) {
         console.error("Error creating client:", err);
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: "Failed to add client",
-            error: err 
+            error: err
         });
     }
 });
@@ -122,9 +158,9 @@ clientRouter.put("/:id/status", verifyToken, async (req: Request, res: Response)
         );
 
         if (!updatedClient) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Client not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Client not found"
             });
         }
 
@@ -134,10 +170,10 @@ clientRouter.put("/:id/status", verifyToken, async (req: Request, res: Response)
             data: updatedClient
         });
     } catch (err) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Failed to update status", 
-            error: err 
+        res.status(500).json({
+            success: false,
+            message: "Failed to update status",
+            error: err
         });
     }
 });
@@ -149,7 +185,7 @@ clientRouter.put("/:id/info", verifyToken, async (req: Request, res: Response) =
 
         const updatedClient = await clientModel.findByIdAndUpdate(
             req.params.id,
-            { 
+            {
                 $set: {
                     "company.contact.name": updateData.contactName,
                     "company.contact.email": updateData.email,
@@ -167,9 +203,9 @@ clientRouter.put("/:id/info", verifyToken, async (req: Request, res: Response) =
         );
 
         if (!updatedClient) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Client not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Client not found"
             });
         }
 
@@ -179,10 +215,10 @@ clientRouter.put("/:id/info", verifyToken, async (req: Request, res: Response) =
             data: updatedClient
         });
     } catch (err) {
-        res.status(500).json({ 
-            success: false, 
-            message: "Failed to update client info", 
-            error: err 
+        res.status(500).json({
+            success: false,
+            message: "Failed to update client info",
+            error: err
         });
     }
 });
@@ -217,7 +253,7 @@ clientRouter.put("/:id/subscription", verifyToken, async (req: Request, res: Res
                     activeServices: { id: serviceId }
                 }
             };
-            
+
             // Recalculate total after removal
             const client = await clientModel.findById(req.params.id);
             if (client) {
@@ -234,9 +270,9 @@ clientRouter.put("/:id/subscription", verifyToken, async (req: Request, res: Res
         );
 
         if (!updatedClient) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Client not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Client not found"
             });
         }
 
@@ -247,10 +283,10 @@ clientRouter.put("/:id/subscription", verifyToken, async (req: Request, res: Res
         });
     } catch (err) {
         console.error("Subscription update error:", err);
-        res.status(500).json({ 
-            success: false, 
-            message: "Failed to update subscription", 
-            error: err 
+        res.status(500).json({
+            success: false,
+            message: "Failed to update subscription",
+            error: err
         });
     }
 });
@@ -261,9 +297,9 @@ clientRouter.delete("/:id", verifyToken, async (req: Request, res: Response) => 
         const deletedClient = await clientModel.findByIdAndDelete(req.params.id);
 
         if (!deletedClient) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Client not found" 
+            return res.status(404).json({
+                success: false,
+                message: "Client not found"
             });
         }
 
@@ -276,10 +312,73 @@ clientRouter.delete("/:id", verifyToken, async (req: Request, res: Response) => 
             data: deletedClient
         });
     } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete client",
+            error: err
+        });
+    }
+});
+
+clientRouter.post("/log-time", verifyToken, async (req: Request, res: Response) => {
+    const { clientId, secondsToAdd } = req.body;
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+        const log = await timeLogModel.findOneAndUpdate(
+            { clientId, date: today },
+            {
+                $inc: { totalSeconds: secondsToAdd },
+                $set: { lastAccessed: new Date() }
+            },
+            { upsert: true, new: true }
+        );
+        res.status(200).json({ success: true, data: log });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err });
+    }
+});
+
+// GET: 10-day history for the modal
+clientRouter.get("/:id/time-history", verifyToken, async (req: Request, res: Response) => {
+    try {
+        // Force 'id' to be treated as a string to satisfy Mongoose types
+        const id = req.params.id as string;
+
+        // 1. Validate ID format
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid Client ID format" 
+            });
+        }
+
+        const clientObjectId = new mongoose.Types.ObjectId(id);
+
+        // 2. Fetch the 10-day history
+        // Casting model to 'any' to bypass the Interface mismatch you had earlier
+        const history = await (timeLogModel as any).find({ clientId: clientObjectId })
+            .sort({ date: -1 })
+            .limit(10)
+            .lean();
+
+        // 3. Get total cumulative time
+        const totalResult = await (timeLogModel as any).aggregate([
+            { $match: { clientId: clientObjectId } },
+            { $group: { _id: null, total: { $sum: "$totalSeconds" } } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            history: (history || []).reverse(),
+            totalSeconds: totalResult[0]?.total || 0
+        });
+    } catch (err) {
+        console.error("History Fetch Error:", err);
         res.status(500).json({ 
             success: false, 
-            message: "Failed to delete client", 
-            error: err 
+            message: "Server error", 
+            error: err instanceof Error ? err.message : err 
         });
     }
 });
