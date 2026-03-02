@@ -11,6 +11,9 @@ const ApplicantSchema = new mongoose.Schema({
   medCard: { type: String, default: 'Awaiting' },
   orderId: { type: String, unique: true },
   profileId: { type: String },
+  // Separate notes fields
+  notes: { type: String, default: '' },       // Internal staffing notes
+  clientNotes: { type: String, default: '' }, // Notes from the Client Portal
   status: { type: String, enum: ['ready', 'progress', 'disqualified'], default: 'progress' },
   createdAt: { type: Date, default: Date.now }
 });
