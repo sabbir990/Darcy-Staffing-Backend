@@ -12,7 +12,9 @@ const ApplicantSchema = new mongoose.Schema({
   orderId: { type: String, unique: true },
   profileId: { type: String },
   status: { type: String, enum: ['ready', 'progress', 'disqualified'], default: 'progress' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  notes: {type: String},
+  clientNotes: {type: String},
 });
 
 export default mongoose.model("Applicant", ApplicantSchema);
