@@ -78,4 +78,38 @@ applicantRouter.get("/upcoming-meetings", async (req: Request, res: Response) =>
     }
 });
 
+applicantRouter.put("/update/:id", async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const { notes } = req.body;
+
+        // console.log(notes)
+
+        // Validate ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid Applicant ID" });
+        }
+
+        // Only update the notes field
+        const updatedApplicant = await Applicant.findByIdAndUpdate(
+            id,
+            { $set: { clientNotes: notes } },
+            { new: true } // returns the updated document
+        );
+
+        if (!updatedApplicant) {
+            return res.status(404).json({ success: false, message: "Applicant not found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Notes updated successfully",
+            data: updatedApplicant
+        });
+    } catch (error: any) {
+        console.error("Update Note Error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default applicantRouter;

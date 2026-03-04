@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const ApplicantSchema = new mongoose.Schema({
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  client: {type: String, required: true},
   name: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
@@ -11,10 +12,11 @@ const ApplicantSchema = new mongoose.Schema({
   medCard: { type: String, default: 'Awaiting' },
   orderId: { type: String, unique: true },
   profileId: { type: String },
+  // Separate notes fields
+  notes: { type: String, default: '' },       // Internal staffing notes
+  clientNotes: { type: String, default: '' }, // Notes from the Client Portal
   status: { type: String, enum: ['ready', 'progress', 'disqualified'], default: 'progress' },
   createdAt: { type: Date, default: Date.now },
-  notes: {type: String},
-  clientNotes: {type: String},
 });
 
 export default mongoose.model("Applicant", ApplicantSchema);
