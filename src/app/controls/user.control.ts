@@ -11,9 +11,14 @@ userRouter.get("/", (req: Request, res: Response) => {
 })
 
 userRouter.post("/register", async (req: Request, res: Response) => {
+
+    // console.log("Router is hitting!");
+
     try {
 
         const userData = req.body;
+
+        // console.log(userData)
 
         const isExists = await userModel.findOne({ email: userData?.email });
 

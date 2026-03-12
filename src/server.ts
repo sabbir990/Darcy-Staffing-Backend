@@ -1,6 +1,11 @@
 import app from "./app.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import dns from "node:dns/promises";
+
+dns.setServers(["1.1.1.1"]);
+
+// console.log(await dns.getServers());
 
 dotenv.config();
 
